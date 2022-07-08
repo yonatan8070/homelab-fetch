@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+
+from cgitb import reset
+from dis import dis
+from math import dist
+import re
+import argparse
+from typing import List
+import subprocess
+
+SHELL_SCRIPT = """cat /etc/os-release || cat /usr/lib/os-release; \
+echo -n ::; \
+uname -sr; \
+echo -n ::; \
+hostname ; \
+echo -n ::; \
+grep -m 1 "model name" /proc/cpuinfo; \
+echo -n ::; \
+grep -E "MemTotal|MemAvailable" /proc/meminfo; \
+echo -n ::; \
+cat /sys/devices/virtual/dmi/id/product_name; \
+echo -n ::; \
+uptime -s; \
+echo -n ::; \
+echo -n $SHELL"""
+
+
+def validate_host(host: str):
+    # Several regexes combined from the Internet, it *should* work for all cases
+    match = re.match(
+        "^[a-zA-Z0-9]{1,30}@(([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|((((?!\-))(xn\-\-)?[a-z0-9\-_]{0,61}[a-z0-9]{1,1}\.)*(xn\-\-)?([a-z0-9\-]{1,61}|[a-z0-9\-]{1,30})\.[a-z]{2,}))$", host)
+    return bool(match)
+
+
+def process_ssh_output(ssh_output: str):
+    command_outputs = ssh_output.split("::")
+    distro = filter_os_release(command_outputs[0])
+    kernel = command_outputs[1].strip()
+    hostname = command_outputs[2].strip()
+    cpu = filter_cpu(command_outputs[3])
+    
+    print(kernel)
+    print(hostname)
+    print(cpu)
+    
+
+
+def filter_os_release(os_release: str):
+    result = {}
+    for line in os_release.splitlines():
+        key, value = line.strip().split("=")
+        result[key] = value.strip('"')
+    distro = "Linux"
+    ansi_color = None
+    
+    if result["PRETTY_NAME"]:
+        distro = result["PRETTY_NAME"]
+    elif result["NAME"]:
+        distro = result["NAME"]
+        
+    
+    return distro, ansi_color
+
+
+def filter_cpu(cpu_info: str):
+    _, cpu = cpu_info.split(": ")
+    return cpu.strip()
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="A fetch tool to get and display homelab information using SSH")
+    parser.add_argument("-t", "--target", help="A target to fetch (username@host)",
+                        type=str, action="append", required=True)
+    args = parser.parse_args()
+
+    targets: List[str] = args.target
+    for target in targets:
+        if not validate_host(target):
+            print(f"{target} is not a valid SSH connection string")
+            exit(1)
+
+    for target in targets:
+        result = subprocess.run(
+            args=["ssh", target, f"sh -c '{SHELL_SCRIPT}'"], capture_output=True).stdout.decode()
+        process_ssh_output(result)
+
+
+if __name__ == "__main__":
+    main()
