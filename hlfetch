@@ -101,6 +101,11 @@ def filter_shell(shell: str):
     return os.path.basename(shell)
 
 
+def render(machines: List):
+    for machine in machines:
+        pass
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="A fetch tool to get and display homelab information using SSH")
@@ -120,6 +125,7 @@ def main():
         ssh_output = subprocess.run(
             args=["ssh", target, f"sh -c '{SHELL_SCRIPT}'"], capture_output=True).stdout.decode()
         machine_info = process_ssh_output(ssh_output)
+        machine_info["ssh_string"] = target
         machines.append(machine_info)
 
 
