@@ -96,22 +96,22 @@ def process_uptime(uptime_str: str):
     days = int(ut // 60 // 60 // 24)
     hours = int(ut // 60 // 60 % 24)
     minutes = int(ut // 60 % 60)
-    
+
     if days == 1:
         days = "1 day"
-    else: 
+    else:
         days = f"{days} days"
-    
+
     if hours == 1:
         hours = "1 hour"
-    else: 
+    else:
         hours = f"{hours} hours"
-    
+
     if minutes == 1:
         minutes = "1 minute"
-    else: 
+    else:
         minutes = f"{minutes} minutes"
-    
+
     result = f"{days}, {hours}, and {minutes}"
     return result
 
@@ -120,9 +120,33 @@ def filter_shell(shell: str):
     return os.path.basename(shell)
 
 
-def render(machines: List):
+def render(machines: List[dict[str, str]]):
     for machine in machines:
-        pass
+        color = machine["color"]
+        header = machine["ssh_string"].partition(
+            "@")[0] + " @ " + machine["hostname"] + " -- " + machine["ssh_string"].partition("@")[2]
+        print_color(f"{header}\n", color)
+        print_color(f"=> ", color)
+        print(f"OS:        {machine['distro']}")
+        print_color(f"=> ", color)
+        print(f"Kernel:    {machine['kernel']}")
+        print_color(f"=> ", color)
+        print(f"CPU:       {machine['cpu']}")
+        print_color(f"=> ", color)
+        print(
+            f"Memory:    {machine['mem_used']}MiB / {machine['mem_total']}MiB")
+        print_color(f"=> ", color)
+        print(f"Platform:  {machine['platform']}")
+        print_color(f"=> ", color)
+        print(f"Uptime:    {machine['uptime']}")
+        print_color(f"=> ", color)
+        print(f"Shell:     {machine['shell']}")
+
+        print()
+
+
+def print_color(out, ansi_color: str, bold: bool = False, italic: bool = False, underline: bool = False):
+    print(f"\033[{ansi_color}m{out}\033[0m", end="")
 
 
 def main():
@@ -146,6 +170,8 @@ def main():
         machine_info = process_ssh_output(ssh_output)
         machine_info["ssh_string"] = target
         machines.append(machine_info)
+
+    render(machines)
 
 
 if __name__ == "__main__":
