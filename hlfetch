@@ -12,11 +12,11 @@ SHELL_SCRIPT = """cat /etc/os-release || cat /usr/lib/os-release; \
 echo -n ::; \
 uname -sr; \
 echo -n ::; \
-hostname ; \
+hostname; \
 echo -n ::; \
 grep -m 1 "model name" /proc/cpuinfo; \
 echo -n ::; \
-grep -E "MemTotal|MemAvailable" /proc/meminfo; \
+free -m | grep Mem:; \
 echo -n ::; \
 cat /sys/devices/virtual/dmi/id/product_name; \
 echo -n ::; \
@@ -38,11 +38,7 @@ def process_ssh_output(ssh_output: str):
     kernel = command_outputs[1].strip()
     hostname = command_outputs[2].strip()
     cpu = filter_cpu(command_outputs[3])
-    
-    print(kernel)
-    print(hostname)
-    print(cpu)
-    
+    mem_total, mem_avail, mem_used = filter_memory(command_outputs[4])
 
 
 def filter_os_release(os_release: str):
@@ -52,21 +48,31 @@ def filter_os_release(os_release: str):
         result[key] = value.strip('"')
     distro = "Linux"
     ansi_color = None
-    
+
     if result["PRETTY_NAME"]:
         distro = result["PRETTY_NAME"]
     elif result["NAME"]:
         distro = result["NAME"]
-        
+
     if result["ANSI_COLOR"]:
         ansi_color = result["ANSI_COLOR"]
-    
+
     return distro, ansi_color
 
 
 def filter_cpu(cpu_info: str):
     _, cpu = cpu_info.split(": ")
     return cpu.strip()
+
+
+def filter_memory(memory_info: str):
+    _, total_str, used_str, _, _, _, avail_str = memory_info.strip().split()
+
+    total_mib = int(total_str)
+    used_mib = int(used_str)
+    avail_mib = int(avail_str)
+
+    return total_mib, avail_mib, used_mib
 
 
 def main():
