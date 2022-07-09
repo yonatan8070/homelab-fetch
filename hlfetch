@@ -34,7 +34,7 @@ def validate_host(host: str):
 
 def process_ssh_output(ssh_output: str):
     command_outputs = ssh_output.split("::")
-    distro = filter_os_release(command_outputs[0])
+    distro, color = filter_os_release(command_outputs[0])
     kernel = command_outputs[1].strip()
     hostname = command_outputs[2].strip()
     cpu = filter_cpu(command_outputs[3])
@@ -58,6 +58,8 @@ def filter_os_release(os_release: str):
     elif result["NAME"]:
         distro = result["NAME"]
         
+    if result["ANSI_COLOR"]:
+        ansi_color = result["ANSI_COLOR"]
     
     return distro, ansi_color
 
