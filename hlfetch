@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from datetime import datetime
 import re
 import argparse
 from typing import List
@@ -17,7 +18,7 @@ free -m | grep Mem:; \
 echo -n ::; \
 cat /sys/devices/virtual/dmi/id/product_name; \
 echo -n ::; \
-uptime -s; \
+cat /proc/uptime; \
 echo -n ::; \
 echo -n $SHELL"""
 
@@ -37,6 +38,7 @@ def process_ssh_output(ssh_output: str):
     cpu = filter_cpu(command_outputs[3])
     mem_total, mem_avail, mem_used = filter_memory(command_outputs[4])
     system_platform = command_outputs[5].strip()
+    uptime = process_uptime(command_outputs[6])
 
 
 def filter_os_release(os_release: str):
@@ -71,6 +73,14 @@ def filter_memory(memory_info: str):
     avail_mib = int(avail_str)
 
     return total_mib, avail_mib, used_mib
+
+
+def process_uptime(uptime_str: str):
+    # Uptime comes in the format: <UPTIME> <IDLE_TIME>
+    # This strips the newline from the end, splits the uptime and idle time, and returns the first element (just the uptime)
+    ut = float(uptime_str.strip().split()[0])
+    result = f"up {int(ut // 60 // 60 // 24)} days, {int(ut // 60 // 60 % 24)} hours, and {int(ut // 60 % 60)} minutes"
+    return result
 
 
 def main():
