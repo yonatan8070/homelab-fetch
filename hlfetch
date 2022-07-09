@@ -36,6 +36,7 @@ def process_ssh_output(ssh_output: str):
     hostname = command_outputs[2].strip()
     cpu = filter_cpu(command_outputs[3])
     mem_total, mem_avail, mem_used = filter_memory(command_outputs[4])
+    system_platform = command_outputs[5].strip()
 
 
 def filter_os_release(os_release: str):
