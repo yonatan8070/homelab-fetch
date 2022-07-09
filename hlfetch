@@ -151,7 +151,7 @@ def print_color(out, ansi_color: str, bold: bool = False, italic: bool = False, 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="A fetch tool to get and display homelab information using SSH")
+        description="A fetch tool that uses SSH to display information about servers in your homelab")
     parser.add_argument("-t", "--target", help="A target to fetch (username@host)",
                         type=str, action="append", required=True)
     args = parser.parse_args()
