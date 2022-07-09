@@ -10,7 +10,7 @@ SHELL_SCRIPT = """cat /etc/os-release || cat /usr/lib/os-release; \
 echo -n ::; \
 uname -sr; \
 echo -n ::; \
-hostname; \
+cat /etc/hostname; \
 echo -n ::; \
 grep -m 1 "model name" /proc/cpuinfo; \
 echo -n ::; \
