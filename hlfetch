@@ -33,7 +33,7 @@ def validate_host(host: str):
 def process_ssh_output(ssh_output: str):
     command_outputs = ssh_output.split("::")
 
-    distro, color = filter_os_release(command_outputs[0])
+    distro, ansi_color = filter_os_release(command_outputs[0])
     kernel = command_outputs[1].strip()
     hostname = command_outputs[2].strip()
     cpu = filter_cpu(command_outputs[3])
@@ -41,6 +41,18 @@ def process_ssh_output(ssh_output: str):
     system_platform = command_outputs[5].strip()
     uptime = process_uptime(command_outputs[6])
     shell = filter_shell(command_outputs[7])
+
+    return {"distro": distro,
+            "color": ansi_color,
+            "kernel": kernel,
+            "hostname": hostname,
+            "cpu": cpu,
+            "mem_total": mem_total,
+            "mem_avail": mem_avail,
+            "mem_used": mem_used,
+            "system_platform": system_platform,
+            "uptime": uptime,
+            "shell": shell}
 
 
 def filter_os_release(os_release: str):
@@ -102,10 +114,13 @@ def main():
             print(f"{target} is not a valid SSH connection string")
             exit(1)
 
+    machines = []
+
     for target in targets:
-        result = subprocess.run(
+        ssh_output = subprocess.run(
             args=["ssh", target, f"sh -c '{SHELL_SCRIPT}'"], capture_output=True).stdout.decode()
-        process_ssh_output(result)
+        machine_info = process_ssh_output(ssh_output)
+        machines.append(machine_info)
 
 
 if __name__ == "__main__":
