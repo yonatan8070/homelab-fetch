@@ -42,17 +42,17 @@ def process_ssh_output(ssh_output: str):
     uptime = process_uptime(command_outputs[6])
     shell = filter_shell(command_outputs[7])
 
-    return {"distro": distro,
-            "color": ansi_color,
-            "kernel": kernel,
-            "hostname": hostname,
-            "cpu": cpu,
-            "mem_total": mem_total,
-            "mem_avail": mem_avail,
-            "mem_used": mem_used,
-            "system_platform": system_platform,
-            "uptime": uptime,
-            "shell": shell}
+    return {"distro": str(distro),
+            "color": str(ansi_color),
+            "kernel": str(kernel),
+            "hostname": str(hostname),
+            "cpu": str(cpu),
+            "mem_total": str(mem_total),
+            "mem_avail": str(mem_avail),
+            "mem_used": str(mem_used),
+            "platform": str(system_platform),
+            "uptime": str(uptime),
+            "shell": str(shell)}
 
 
 def filter_os_release(os_release: str):
