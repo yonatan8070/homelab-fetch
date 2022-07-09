@@ -93,7 +93,26 @@ def process_uptime(uptime_str: str):
     # Uptime comes in the format: <UPTIME> <IDLE_TIME>
     # This strips the newline from the end, splits the uptime and idle time, and returns the first element (just the uptime)
     ut = float(uptime_str.strip().split()[0])
-    result = f"up {int(ut // 60 // 60 // 24)} days, {int(ut // 60 // 60 % 24)} hours, and {int(ut // 60 % 60)} minutes"
+    days = int(ut // 60 // 60 // 24)
+    hours = int(ut // 60 // 60 % 24)
+    minutes = int(ut // 60 % 60)
+    
+    if days == 1:
+        days = "1 day"
+    else: 
+        days = f"{days} days"
+    
+    if hours == 1:
+        hours = "1 hour"
+    else: 
+        hours = f"{hours} hours"
+    
+    if minutes == 1:
+        minutes = "1 minute"
+    else: 
+        minutes = f"{minutes} minutes"
+    
+    result = f"{days}, {hours}, and {minutes}"
     return result
 
 
