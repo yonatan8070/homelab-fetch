@@ -16,7 +16,7 @@ grep -m 1 "model name" /proc/cpuinfo; \
 echo -n ::; \
 free -m | grep Mem:; \
 echo -n ::; \
-cat /sys/devices/virtual/dmi/id/product_name; \
+cat /sys/devices/virtual/dmi/id/board_vendor /sys/devices/virtual/dmi/id/product_name; \
 echo -n ::; \
 cat /proc/uptime; \
 echo -n ::; \
@@ -38,7 +38,7 @@ def process_ssh_output(ssh_output: str):
     hostname = command_outputs[2].strip()
     cpu = filter_cpu(command_outputs[3])
     mem_total, mem_avail, mem_used = filter_memory(command_outputs[4])
-    system_platform = command_outputs[5].strip()
+    system_platform = command_outputs[5].strip().replace("\n", " ")
     uptime = process_uptime(command_outputs[6])
     shell = filter_shell(command_outputs[7])
 
