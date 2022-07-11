@@ -145,7 +145,7 @@ def render(machines: List[dict[str, str]]):
         print()
 
 
-def print_color(out, ansi_color: str, bold: bool = False, italic: bool = False, underline: bool = False):
+def print_color(out, ansi_color: str):
     if ansi_color == None:
         ansi_color = "0"
     print(f"\033[{ansi_color}m{out}\033[0m", end="")
