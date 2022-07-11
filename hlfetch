@@ -169,13 +169,14 @@ def main():
     for target in targets:
         ssh_output = subprocess.run(
             args=["ssh", target, f"sh -c '{SHELL_SCRIPT}'"], capture_output=True)
-        
+
         try:
             ssh_output.check_returncode()
         except subprocess.CalledProcessError as e:
-            print(f"{target} SSH connection failed with error:\n{e.stderr.decode().strip()}")
+            print(
+                f"{target} SSH connection failed with error:\n{e.stderr.decode().strip()}")
             exit(1)
-        
+
         ssh_output_str = ssh_output.stdout.decode()
         machine_info = process_ssh_output(ssh_output_str)
         machine_info["ssh_string"] = target
