@@ -151,7 +151,7 @@ def print_color(out, ansi_color: str):
     print(f"\033[{ansi_color}m{out}\033[0m", end="")
 
 
-def rgb_to_ansi(rgb: str) -> str:
+def rgb_to_ansi(rgb: str, background: bool = False) -> str:
     if rgb[0] == '#':
         r = int(rgb[1:3], base=16)
         print(rgb[1:3])
@@ -159,7 +159,7 @@ def rgb_to_ansi(rgb: str) -> str:
         print(rgb[3:5])
         b = int(rgb[5:7], base=16)
         print(rgb[5:7])
-        result = f"38;2;{r};{g};{b}"
+        result = f"{38 if not background else 48};2;{r};{g};{b}"
         print(result)
         return result
     else:
