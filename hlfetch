@@ -152,6 +152,7 @@ def print_color(out, ansi_color: str):
 
 
 def rgb_to_ansi(rgb: str, background: bool = False) -> str:
+    # https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797 info on RGB escape codes
     if rgb[0] == '#':
         r = int(rgb[1:3], base=16)
         print(rgb[1:3])
