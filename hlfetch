@@ -129,20 +129,20 @@ def render(machines: List[dict[str, str]]):
         header = machine["ssh_string"].partition(
             "@")[0] + " @ " + machine["hostname"] + " -- " + machine["ssh_string"].partition("@")[2]
         print_color(f"{header}\n", color)
-        print_color(f"=> ", color)
+        print_color(f" => ", color)
         print(f"OS:        {machine['distro']}")
-        print_color(f"=> ", color)
+        print_color(f" => ", color)
         print(f"Kernel:    {machine['kernel']}")
-        print_color(f"=> ", color)
+        print_color(f" => ", color)
         print(f"CPU:       {machine['cpu']}")
-        print_color(f"=> ", color)
+        print_color(f" => ", color)
         print(
             f"Memory:    {machine['mem_used']}MiB / {machine['mem_total']}MiB")
-        print_color(f"=> ", color)
+        print_color(f" => ", color)
         print(f"Platform:  {machine['platform']}")
-        print_color(f"=> ", color)
+        print_color(f" => ", color)
         print(f"Uptime:    {machine['uptime']}")
-        print_color(f"=> ", color)
+        print_color(f" => ", color)
         print(f"Shell:     {machine['shell']}")
 
         print()
