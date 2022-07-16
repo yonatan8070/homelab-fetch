@@ -6,7 +6,7 @@ import argparse
 from typing import List
 import subprocess
 
-SHELL_SCRIPT = """cat /etc/os-release || cat /usr/lib/os-release; \
+SHELL_SCRIPT = """cat /etc/os-release || cat /usr/lib/os-release || echo "os-release failed"; \
 echo -n ::; \
 uname -sr; \
 echo -n ::; \
@@ -43,7 +43,7 @@ def process_ssh_output(ssh_output: str):
     shell = filter_shell(command_outputs[7])
 
     return {"distro": str(distro),
-            "color": str(ansi_color),
+            "color": str(ansi_color) if ansi_color != None else None,
             "kernel": str(kernel),
             "hostname": str(hostname),
             "cpu": str(cpu),
@@ -56,6 +56,9 @@ def process_ssh_output(ssh_output: str):
 
 
 def filter_os_release(os_release: str):
+    if os_release.strip() == "os-release failed":
+        return "Unknown OS", None
+
     result = {}
     for line in os_release.splitlines():
         key, value = line.strip().split("=")
