@@ -65,14 +65,19 @@ def filter_os_release(os_release: str):
         result[key] = value.strip('"')
     distro = "Linux"
     ansi_color = None
-
-    if result["PRETTY_NAME"]:
+    
+    try:
         distro = result["PRETTY_NAME"]
-    elif result["NAME"]:
-        distro = result["NAME"]
-
-    if result["ANSI_COLOR"]:
+    except:
+        try:
+            distro = result["NAME"]
+        except:
+            distro = "Unknown"
+    
+    try:
         ansi_color = result["ANSI_COLOR"]
+    except:
+        ansi_color = None
 
     return distro, ansi_color
 
