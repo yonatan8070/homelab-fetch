@@ -173,6 +173,7 @@ def main():
         description="A fetch tool that uses SSH to display information about servers in your homelab")
     parser.add_argument("-t", "--target", help="A target to fetch (username@host)",
                         type=str, action="append", required=True)
+    parser.add_argument("-d", "--debug", action="store_true", help="Print the raw SSH output for debugging")
     args = parser.parse_args()
 
     targets: List[str] = args.target
@@ -191,11 +192,15 @@ def main():
             exit(1)
 
         ssh_output_str = ssh_output.stdout.decode()
+        if args.debug:
+            print(ssh_output_str)
+            continue
         machine_info = process_ssh_output(ssh_output_str)
         machine_info["ssh_string"] = target
         machines.append(machine_info)
-
-    render(machines)
+        
+    if not args.debug:
+        render(machines)
 
 
 if __name__ == "__main__":
