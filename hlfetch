@@ -3,6 +3,7 @@
 import os
 import re
 import argparse
+import sys
 from typing import Dict, List
 import subprocess
 
@@ -58,7 +59,7 @@ def filter_os_release(os_release: str):
         result[key] = value.strip('"')
     distro = "Linux"
     ansi_color = None
-    
+
     try:
         distro = result["PRETTY_NAME"]
     except:
@@ -66,7 +67,7 @@ def filter_os_release(os_release: str):
             distro = result["NAME"]
         except:
             distro = "Unknown"
-    
+
     try:
         ansi_color = result["ANSI_COLOR"]
     except:
@@ -168,15 +169,41 @@ def rgb_to_ansi(rgb: str, background: bool = False) -> str:
         return "0"
 
 
+def parse_targets_file(file: str) -> List[str]:
+    result = []
+    try:
+        with open(file, "r") as f:
+            lines = f.read().splitlines()
+            for i in range(0, len(lines)):
+                # Remove everything after "#" and strip any remaining whitespace
+                target = lines[i].split("#")[0].strip()
+                if target != "":
+                    result.append(target)
+    except Exception as e:
+        print(e, file=sys.stderr)
+
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="A fetch tool that uses SSH to display information about servers in your homelab")
     parser.add_argument("-t", "--target", help="A target to fetch (username@host)",
-                        type=str, action="append", required=True)
-    parser.add_argument("-d", "--debug", action="store_true", help="Print the raw SSH output for debugging")
+                        type=str, action="append", required=False)
+    parser.add_argument("-f", "--file", help="Newline seperated file containing targets (username@host)",
+                        type=str, action="append", required=False)
+    parser.add_argument("-d", "--debug", action="store_true",
+                        help="Print the raw SSH output for debugging")
     args = parser.parse_args()
 
     targets: List[str] = args.target
+    if targets == None:
+        targets = []
+
+    if args.file != None:
+        for file in args.file:
+            new_targets = parse_targets_file(file)
+            targets += new_targets
 
     machines = []
 
@@ -198,7 +225,7 @@ def main():
         machine_info = process_ssh_output(ssh_output_str)
         machine_info["ssh_string"] = target
         machines.append(machine_info)
-        
+
     if not args.debug:
         render(machines)
 
